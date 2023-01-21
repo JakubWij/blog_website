@@ -1,1 +1,1 @@
-web: uwsgi --http :8080 --wsgi-file main.py --callable app --processes 4 --threads 2
+web: gunicorn main:app
