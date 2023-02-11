@@ -11,6 +11,7 @@ from forms import CreatePostForm, RegisterForm, LoginForm, CommentForm
 from flask_gravatar import Gravatar
 from sqlalchemy import ForeignKey
 import os
+import smtplib
 
 app = Flask(__name__)
 app.app_context().push()
@@ -94,6 +95,18 @@ class Comment(db.Model):
 
 db.create_all()
 
+def send_mail(name, email, phone, message):
+    # connection and mail
+    my_email = os.environ.get("MY_MAIL")
+    password = os.environ.get('MAIL_PASSWORD')
+    connection = smtplib.SMTP("smtp.gmail.com", 587, timeout=120)
+    connection.starttls()
+    connection.login(user=my_email, password=password)
+    connection.sendmail(from_addr=email, to_addrs=my_email, msg=f"Subject:Blog's msg\n\nUsername:{name}"
+                                                                f"\nEmail:{email}"
+                                                                f"\nPhone: {phone},"
+                                                                f"\nMessage: {message}")
+    connection.close()
 
 @app.route('/')
 def get_all_posts():
@@ -178,10 +191,17 @@ def about():
     return render_template("about.html", current_user=current_user)
 
 
-@app.route("/contact")
+@app.route("/contact", methods=["POST", "GET"])
 def contact():
-    return render_template("contact.html", current_user=current_user)
-
+    if request.method == "GET":
+        return render_template("contact.html", msg_sent=False)
+    elif request.method == "POST":
+        username = request.form["username"]
+        email = request.form["user_email"]
+        phone = request.form["user_phone"]
+        message = request.form["user_message"]
+        send_mail(username, email, phone, message)
+        return render_template("contact.html", msg_sent=True, current_user=current_user)
 
 @app.route("/new-post", methods=["GET", "POST"])
 @admin_only
