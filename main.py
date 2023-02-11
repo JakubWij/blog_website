@@ -97,8 +97,8 @@ db.create_all()
 
 def send_mail(name, email, phone, message):
     # connection and mail
-    my_email = os.environ.get("MY_MAIL")
-    password = os.environ.get('MAIL_PASSWORD')
+    my_email = os.getenv('MY_MAIL')
+    password = os.getenv('MAIL_PASSWORD')
     connection = smtplib.SMTP("smtp.gmail.com", 587, timeout=120)
     connection.starttls()
     connection.login(user=my_email, password=password)
