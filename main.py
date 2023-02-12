@@ -99,13 +99,11 @@ def send_mail(name, email, phone, message):
     # connection and mail
     my_email = os.getenv('MY_MAIL')
     password = os.getenv('MAIL_PASSWORD')
+    msg = f"Subject:Blog's msg\n\nUsername:{name}\nEmail:{email}\nPhone: {phone},\nMessage: {message}"
     connection = smtplib.SMTP("smtp.gmail.com", 587, timeout=120)
     connection.starttls()
     connection.login(user=my_email, password=password)
-    connection.sendmail(from_addr=email, to_addrs=my_email, msg=f"Subject:Blog's msg\n\nUsername:{name}"
-                                                                f"\nEmail:{email}"
-                                                                f"\nPhone: {phone},"
-                                                                f"\nMessage: {message}")
+    connection.sendmail(from_addr=email, to_addrs=my_email, msg=msg.encode('utf-8'))
     connection.close()
 
 @app.route('/')
